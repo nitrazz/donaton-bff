@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: donaton-bff
+
+# ── URLs de Microservicios ────────────────────────────────────────────────────
+donaton:
+  ms:
+    logistica:
+      url: http://localhost:8082
+    necesidades:
+      url: http://localhost:8083
+    donaciones:
+      url: http://localhost:8081
+
+# ── Resilience4j ──────────────────────────────────────────────────────────────
+resilience4j:
+  circuitbreaker:
+    instances:
+      logisticaCB:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+      necesidades:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging:
+  level:
+    com.donaton: DEBUG
+    org.springframework.web.client: DEBUG
