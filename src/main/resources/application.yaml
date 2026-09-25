@@ -5,6 +5,27 @@ spring:
   application:
     name: donaton-bff
 
+  # ── Microsoft Entra ID (Azure) Ñembopyahu ───────────────────────────
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Reprocesávo, remoĩta ne Azure Tenant ID mba'erã
+          issuer-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID:AQUI_VA_TU_TENANT_ID}/v2.0
+          jwk-set-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID:AQUI_VA_TU_TENANT_ID}/discovery/v2.0/keys
+  spring:
+    security:
+      oauth2:
+        resourceserver:
+          jwt:
+            issuer-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID:AQUI_VA_TU_TENANT_ID}/v2.0
+            jwk-set-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID:AQUI_VA_TU_TENANT_ID}/discovery/v2.0/keys
+            audiences: ${AZURE_BACKEND_CLIENT_ID:api://AQUI_VA_TU_BACKEND_CLIENT_ID}
+# ── CORS Ñembopyahu Frontend-pe guarã ─────────────────────────────
+app:
+  cors:
+    allowed-origins: "http://localhost:5173"
+
 # ── URLs de Microservicios ────────────────────────────────────────────────────
 donaton:
   ms:
@@ -37,3 +58,5 @@ logging:
   level:
     com.donaton: DEBUG
     org.springframework.web.client: DEBUG
+    org.springframework.security: DEBUG
+
