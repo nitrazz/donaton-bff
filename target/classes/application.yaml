@@ -1,0 +1,80 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: donaton-bff
+
+  # ── RabbitMQ Cluster en AWS ──────────────────────────────────────────────────
+  rabbitmq:
+    host: 52.72.51.166
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual
+
+  # ── Seguridad OAuth2 (Azure Entra ID) ───────────────────────────────────────
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID:AQUI_VA_TU_TENANT_ID}/v2.0
+          jwk-set-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID:AQUI_VA_TU_TENANT_ID}/discovery/v2.0/keys
+          audiences: ${AZURE_BACKEND_CLIENT_ID:api://AQUI_VA_TU_BACKEND_CLIENT_ID}
+
+# ── Configuración de la Aplicación ────────────────────────────────────────────
+app:
+  cors:
+    allowed-origins: "http://localhost:5173"
+  rabbitmq:
+    exchanges:
+      donaciones: donaciones.direct
+      notificaciones: notificaciones.topic
+      dlx: dlx.direct
+    queues:
+      donaciones: cola.donaciones
+      notificaciones: cola.notificaciones
+      documentos: cola.documentos
+      dlq-donaciones: dlq.donaciones
+      dlq-notificaciones: dlq.notificaciones
+      dlq-documentos: dlq.documentos
+    routing-keys:
+      donacion-creada: donacion.creada
+      documento-generar: documento.generar
+      notificacion-topic: notif.#
+
+# ── URLs de Microservicios ────────────────────────────────────────────────────
+donaton:
+  ms:
+    logistica:
+      url: http://localhost:8082
+    necesidades:
+      url: http://localhost:8083
+    donaciones:
+      url: http://localhost:8081
+
+# ── Resilience4j ──────────────────────────────────────────────────────────────
+resilience4j:
+  circuitbreaker:
+    instances:
+      logisticaCB:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+      necesidades:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging:
+  level:
+    com.donaton: DEBUG
+    org.springframework.web.client: DEBUG
+    org.springframework.security: DEBUG
