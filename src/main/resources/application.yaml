@@ -7,7 +7,7 @@ spring:
 
   # ── RabbitMQ Cluster en AWS ──────────────────────────────────────────────────
   rabbitmq:
-    host: 52.72.51.166
+    host: 100.48.180.247
     port: 5672
     username: guest
     password: guest
